@@ -35,10 +35,11 @@ public class SecurityConfig {
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/error").permitAll()
-                // Covers both with and without context-path
+                .requestMatchers("/", "/favicon.ico", "/error").permitAll()
+                .requestMatchers("/actuator/**").permitAll()
                 .requestMatchers("/auth/**", "/api/auth/**").permitAll()
                 .requestMatchers("/whatsapp/**", "/api/whatsapp/**").permitAll()
+                .requestMatchers("/webhook/**", "/api/webhook/**", "/api/v1/webhook/**").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

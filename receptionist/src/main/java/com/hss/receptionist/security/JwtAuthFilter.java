@@ -26,11 +26,19 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private static final Logger log = LoggerFactory.getLogger(JwtAuthFilter.class);
     private final JwtService jwtService;
 
-    // --- THIS IS THE METHOD WE UPDATED ---
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        return path.contains("/auth/") || path.contains("/whatsapp/");
+        return path.startsWith("/actuator")
+            || path.startsWith("/webhook")
+            || path.startsWith("/api/webhook")
+            || path.startsWith("/whatsapp")
+            || path.startsWith("/api/whatsapp")
+            || path.startsWith("/auth")
+            || path.startsWith("/api/auth")
+            || path.equals("/")
+            || path.startsWith("/favicon.ico")
+            || path.startsWith("/error");
     }
 
     @Override
@@ -40,7 +48,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            log.warn("Path [{}] - No Bearer token found in header", request.getRequestURI());
             filterChain.doFilter(request, response);
             return;
         }
@@ -50,9 +57,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             String email = jwtService.extractEmail(token);
             String role = jwtService.extractClaim(token, claims -> claims.get("role", String.class));
             Long businessId = jwtService.extractBusinessId(token);
-
-            log.info("Path [{}] - Token decoded. Email: {}, BusinessId: {}, Role: {}", 
-                     request.getRequestURI(), email, businessId, role);
 
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 String authorityName = (role == null || role.isBlank())
@@ -72,9 +76,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 );
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
-
-                log.info("Path [{}] - SecurityContext successfully populated for user [{}] with authority [{}]", 
-                         request.getRequestURI(), email, authorityName);
             }
         } catch (Exception ex) {
             log.error("Path [{}] - JWT validation failed: {}", request.getRequestURI(), ex.getMessage(), ex);
