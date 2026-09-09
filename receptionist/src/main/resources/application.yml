@@ -1,0 +1,57 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  application:
+    name: receptionist
+
+  # Database configuration (configured for Neon PostgreSQL)
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/receptionist_db}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:password123}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  # Database Migrations
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    repair-on-migrate: true
+
+  # Google Gemini AI Integration
+  ai:
+    google:
+      genai:
+        api-key: ${GEMINI_API_KEY}
+        chat:
+          options:
+            model: gemini-2.5-flash
+
+# JWT Authentication Config
+jwt:
+  secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+  expiration-ms: 86400000
+
+# WhatsApp Cloud API Config
+whatsapp:
+  webhook:
+    verify-token: ${WHATSAPP_VERIFY_TOKEN:hss_secure_verify_token}
+  api-base-url: https://graph.facebook.com/v19.0
+  phone-number-id: ${WHATSAPP_PHONE_NUMBER_ID}
+  access-token: ${WHATSAPP_ACCESS_TOKEN}
+
+# Health check endpoint for Cron-job / Keep-awake pingers
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
