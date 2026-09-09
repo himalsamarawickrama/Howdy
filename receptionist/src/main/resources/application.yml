@@ -5,16 +5,16 @@ spring:
   application:
     name: receptionist
 
-  # Database configuration (configured for Neon PostgreSQL)
+  # Database configuration (Neon PostgreSQL)
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/receptionist_db}
-    username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: ${SPRING_DATASOURCE_PASSWORD:password123}
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: false
     properties:
       hibernate:
@@ -31,14 +31,14 @@ spring:
   ai:
     google:
       genai:
-        api-key: ${GEMINI_API_KEY:AQ.Ab8RN6J8eDSSTiE6UfaewGLXOsU3LxSxwMbc9E8Mk288fG5qRA}
+        api-key: ${GEMINI_API_KEY}
         chat:
           options:
             model: gemini-2.5-flash
 
 # JWT Authentication Config
 jwt:
-  secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+  secret: ${JWT_SECRET}
   expiration-ms: 86400000
 
 # WhatsApp Cloud API Config
@@ -49,7 +49,7 @@ whatsapp:
   phone-number-id: ${WHATSAPP_PHONE_NUMBER_ID}
   access-token: ${WHATSAPP_ACCESS_TOKEN}
 
-# Health check endpoint for Cron-job / Keep-awake pingers
+# Actuator keep-alive endpoints
 management:
   endpoints:
     web:
